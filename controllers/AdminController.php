@@ -4,6 +4,8 @@ namespace app\controllers;
 
 use app\models\Application;
 use app\models\ApplicationSearch;
+use app\models\Status;
+use Yii;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -13,6 +15,19 @@ use yii\filters\VerbFilter;
  */
 class AdminController extends Controller
 {
+    public function beforeAction($action)
+    {
+        if (!parent::beforeAction($action)) {
+            return false;
+        }
+
+        if (!Yii::$app->user->identity?->isAdmin) {
+            return $this->redirect('/');
+        }
+
+        return true; // or false to not run the action
+    }
+
     /**
      * @inheritDoc
      */
@@ -22,7 +37,7 @@ class AdminController extends Controller
             parent::behaviors(),
             [
                 'verbs' => [
-                    'class' => VerbFilter::className(),
+                    'class' => VerbFilter::class,
                     'actions' => [
                         'delete' => ['POST'],
                     ],
@@ -65,55 +80,23 @@ class AdminController extends Controller
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return string|\yii\web\Response
      */
-    public function actionCreate()
+    public function actionChangeStatus($id, $alias)
     {
-        $model = new Application();
+        $model = $this->findModel($id);
 
         if ($this->request->isPost) {
-            if ($model->load($this->request->post()) && $model->save()) {
+            $status = Status::findOne(['alias' => $alias]);
+            $model->status_id = $status->id;
+
+            if ($model->save(false)) {
+                Yii::$app->session->setFlash('success', 'Вы успешно смнеили статус на "' . $status->title .  '"!');
                 return $this->redirect(['view', 'id' => $model->id]);
             }
         } else {
             $model->loadDefaultValues();
         }
 
-        return $this->render('create', [
-            'model' => $model,
-        ]);
-    }
-
-    /**
-     * Updates an existing Application model.
-     * If update is successful, the browser will be redirected to the 'view' page.
-     * @param int $id ID
-     * @return string|\yii\web\Response
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    public function actionUpdate($id)
-    {
-        $model = $this->findModel($id);
-
-        if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
-        }
-
-        return $this->render('update', [
-            'model' => $model,
-        ]);
-    }
-
-    /**
-     * Deletes an existing Application model.
-     * If deletion is successful, the browser will be redirected to the 'index' page.
-     * @param int $id ID
-     * @return \yii\web\Response
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    public function actionDelete($id)
-    {
-        $this->findModel($id)->delete();
-
-        return $this->redirect(['index']);
+        return $this->render('index');
     }
 
     /**

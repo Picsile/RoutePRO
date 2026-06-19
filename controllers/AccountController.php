@@ -18,6 +18,19 @@ use yii\web\UploadedFile;
  */
 class AccountController extends Controller
 {
+    public function beforeAction($action)
+    {
+        if (!parent::beforeAction($action)) {
+            return false;
+        }
+
+        if (!Yii::$app->user->identity?->isAccount) {
+            return $this->redirect('/');
+        }
+
+        return true; // or false to not run the action
+    }
+
     /**
      * @inheritDoc
      */

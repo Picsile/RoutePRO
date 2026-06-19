@@ -56,7 +56,9 @@ use yii\widgets\DetailView;
         ]) ?>
 
         <div class="pt-0 p-3">
-            <?= $model->status->alias == 'Finish' && !$model->feedback ? Html::a('Оставить отзыв', ['feedback', 'id' => $model->id], ['class' => 'btn btn-outline-success']) : '' ?>
+            <?= $model->status->alias == 'New' ? Html::a('Подтверждена', ['change-status', 'id' => $model->id, 'alias' => 'Success'], ['class' => 'btn btn-outline-primary', 'data-method' => 'post']) : '' ?>
+            <?= $model->status->alias == 'Success' ? Html::a('Тур проводится', ['change-status', 'id' => $model->id, 'alias' => 'Run'], ['class' => 'btn btn-outline-success', 'data-method' => 'post']) : '' ?>
+            <?= $model->status->alias == 'Run' ? Html::a('Завершена', ['change-status', 'id' => $model->id, 'alias' => 'Finish'], ['class' => 'btn btn-outline-success', 'data-method' => 'post']) : '' ?>
         </div>
     </div>
 </div>

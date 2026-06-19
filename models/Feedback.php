@@ -14,7 +14,18 @@ use Yii;
  */
 class Feedback extends \yii\db\ActiveRecord
 {
+    public function beforeAction($action)
+    {
+        if (!parent::beforeAction($action)) {
+            return false;
+        }
 
+        if (!Yii::$app->user->identity?->isAccount) {
+            return $this->redirect('/');
+        }
+
+        return true; // or false to not run the action
+    }
 
     /**
      * {@inheritdoc}
@@ -58,5 +69,4 @@ class Feedback extends \yii\db\ActiveRecord
     {
         return $this->hasOne(Application::class, ['id' => 'application_id']);
     }
-
 }
