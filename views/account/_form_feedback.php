@@ -14,14 +14,7 @@ use yii\bootstrap5\ActiveForm;
 
     <?php $form = ActiveForm::begin(); ?>
 
-
-    <?= $form->field($model, 'programm_id')->dropDownList(Programm::getProgramms(), ['prompt' => 'Выберите программу или тур']) ?>
-
-    <?= $form->field($model, 'date')->textInput(['type' => 'date']) ?>
-
-    <?= $form->field($uploadForm, 'imageFile')->fileInput() ?>
-
-    <?= $form->field($model, 'pay_type_id')->dropDownList(PayType::getPayTypes(), ['prompt' => 'Выберите способ оплаты']) ?>
+    <?= $form->field($feedback, 'comment')->textInput() ?>
 
     <div class="form-group">
         <?= Html::submitButton('Отправить', ['class' => 'btn w-100 btn-accent btn-success']) ?>

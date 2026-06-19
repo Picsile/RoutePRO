@@ -3,10 +3,15 @@
 namespace app\controllers;
 
 use app\models\Application;
+use app\models\Feedback;
+use app\models\Image;
+use app\models\UploadForm;
+use Yii;
 use yii\data\ActiveDataProvider;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\web\UploadedFile;
 
 /**
  * AccountController implements the CRUD actions for Application model.
@@ -39,17 +44,17 @@ class AccountController extends Controller
     public function actionIndex()
     {
         $dataProvider = new ActiveDataProvider([
-            'query' => Application::find(),
-            /*
+            'query' => Application::find()->where(['user_id' => Yii::$app->user->id]),
+
             'pagination' => [
-                'pageSize' => 50
+                'pageSize' => 5
             ],
             'sort' => [
                 'defaultOrder' => [
                     'id' => SORT_DESC,
                 ]
             ],
-            */
+
         ]);
 
         return $this->render('index', [
@@ -78,10 +83,27 @@ class AccountController extends Controller
     public function actionCreate()
     {
         $model = new Application();
+        $uploadForm = new UploadForm();
+        $image = new Image();
 
         if ($this->request->isPost) {
-            if ($model->load($this->request->post()) && $model->save()) {
-                return $this->redirect(['view', 'id' => $model->id]);
+            if ($model->load($this->request->post())) {
+
+                $uploadForm->imageFile = UploadedFile::getInstance($uploadForm, 'imageFile');
+                if ($path = $uploadForm->upload()) {
+
+                    $model->user_id = Yii::$app->user->id;
+                    $model->status_id = 1;
+
+                    if ($model->save()) {
+                        $image->application_id = $model->id;
+                        $image->path = $path;
+                        $image->save();
+
+                        Yii::$app->session->setFlash('success', 'Вы успешно создали заявку!');
+                        return $this->redirect(['view', 'id' => $model->id]);
+                    }
+                }
             }
         } else {
             $model->loadDefaultValues();
@@ -89,6 +111,7 @@ class AccountController extends Controller
 
         return $this->render('create', [
             'model' => $model,
+            'uploadForm' => $uploadForm,
         ]);
     }
 
@@ -99,31 +122,24 @@ class AccountController extends Controller
      * @return string|\yii\web\Response
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionUpdate($id)
+    public function actionFeedback($id)
     {
         $model = $this->findModel($id);
+        $feedback = new Feedback();
 
-        if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+        if ($this->request->isPost && $feedback->load($this->request->post())) {
+            $feedback->application_id = $model->id;
+
+            if ($feedback->save()) {
+                Yii::$app->session->setFlash('success', 'Вы успешно оставили отзыв!');
+                return $this->redirect(['view', 'id' => $model->id]);
+            }
         }
 
-        return $this->render('update', [
+        return $this->render('feedback', [
             'model' => $model,
+            'feedback' => $feedback,
         ]);
-    }
-
-    /**
-     * Deletes an existing Application model.
-     * If deletion is successful, the browser will be redirected to the 'index' page.
-     * @param int $id ID
-     * @return \yii\web\Response
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    public function actionDelete($id)
-    {
-        $this->findModel($id)->delete();
-
-        return $this->redirect(['index']);
     }
 
     /**

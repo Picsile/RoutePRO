@@ -13,7 +13,7 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="site-login">
 
-    <div class="col-lg-8 d-flex">
+    <div class="col-lg-8">
 
         <div class="d-flex w-100 gap-3 border shadow-sm rounded-5 overflow-hidden">
             <div style="background-color:blue; width: 500px; height: 100%;" class="overflow-hidden">

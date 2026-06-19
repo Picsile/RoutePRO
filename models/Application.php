@@ -40,8 +40,8 @@ class Application extends \yii\db\ActiveRecord
     {
         return [
             [['user_id', 'programm_id', 'date', 'pay_type_id', 'status_id'], 'required'],
-            [['user_id', 'programm_id', 'date', 'pay_type_id', 'status_id'], 'integer'],
-            [['created_at'], 'safe'],
+            [['user_id', 'programm_id', 'pay_type_id', 'status_id'], 'integer'],
+            [['date', 'created_at'], 'safe'],
             [['pay_type_id'], 'exist', 'skipOnError' => true, 'targetClass' => PayType::class, 'targetAttribute' => ['pay_type_id' => 'id']],
             [['programm_id'], 'exist', 'skipOnError' => true, 'targetClass' => Programm::class, 'targetAttribute' => ['programm_id' => 'id']],
             [['status_id'], 'exist', 'skipOnError' => true, 'targetClass' => Status::class, 'targetAttribute' => ['status_id' => 'id']],
@@ -55,13 +55,13 @@ class Application extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'id' => 'ID',
-            'user_id' => 'User ID',
-            'programm_id' => 'Programm ID',
-            'date' => 'Date',
-            'pay_type_id' => 'Pay Type ID',
-            'status_id' => 'Status ID',
-            'created_at' => 'Created At',
+            'id' => '№',
+            'user_id' => 'ФИО',
+            'programm_id' => 'Программа',
+            'date' => 'Дата',
+            'pay_type_id' => 'Способ оплаты',
+            'status_id' => 'Статус зявки',
+            'created_at' => 'Время создания заявки',
         ];
     }
 
@@ -115,4 +115,8 @@ class Application extends \yii\db\ActiveRecord
         return $this->hasOne(User::class, ['id' => 'user_id']);
     }
 
+    public function getImage()
+    {
+        return $this->hasOne(Image::class, ['application_id' => 'id']);
+    }
 }
