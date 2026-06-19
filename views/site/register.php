@@ -13,7 +13,7 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="site-contact">
 
     <div class="row">
-        <div class="col-lg-8 d-flex" style="height: 730px;">
+        <div class="col-lg-8 d-flex">
 
             <div class="d-flex w-100 gap-3 border shadow-sm rounded-5 overflow-hidden">
 
@@ -40,6 +40,11 @@ $this->params['breadcrumbs'][] = $this->title;
 
                     <div class="form-group">
                         <?= Html::submitButton('Зарегистрироваться', ['class' => 'btn btn-accent w-100 btn-primary', 'name' => 'contact-button']) ?>
+                    </div>
+
+                    <div>
+                        <span>Уже есть аккаунт?</span>
+                        <?= Html::a('Войти', 'login') ?>
                     </div>
 
                     <?php ActiveForm::end(); ?>

@@ -4,6 +4,9 @@ namespace app\models;
 
 use Yii;
 
+use yii\db\ActiveRecord;
+use yii\web\IdentityInterface;
+
 /**
  * This is the model class for table "user".
  *
@@ -18,10 +21,8 @@ use Yii;
  *
  * @property Application[] $applications
  */
-class User extends \yii\db\ActiveRecord
+class User extends ActiveRecord implements IdentityInterface
 {
-
-
     /**
      * {@inheritdoc}
      */
@@ -37,8 +38,11 @@ class User extends \yii\db\ActiveRecord
     {
         return [
             [['role'], 'default', 'value' => 0],
+
             [['full_name', 'login', 'password', 'email', 'phone', 'auth_key'], 'required'],
+
             [['role'], 'integer'],
+
             [['full_name', 'login', 'password', 'email', 'phone', 'auth_key'], 'string', 'max' => 255],
             [['login'], 'unique'],
         ];
@@ -71,4 +75,64 @@ class User extends \yii\db\ActiveRecord
         return $this->hasMany(Application::class, ['user_id' => 'id']);
     }
 
+    public static function findIdentity($id)
+    {
+        return static::findOne($id);
+    }
+
+    /**
+     * Finds an identity by the given token.
+     *
+     * @param string $token the token to be looked for
+     * @return IdentityInterface|null the identity object that matches the given token.
+     */
+    public static function findIdentityByAccessToken($token, $type = null)
+    {
+        return static::findOne(['access_token' => $token]);
+    }
+
+    /**
+     * @return int|string current user ID
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * @return string|null current user auth key
+     */
+    public function getAuthKey()
+    {
+        return $this->auth_key;
+    }
+
+    /**
+     * @param string $authKey
+     * @return bool|null if auth key is valid for current user
+     */
+    public function validateAuthKey($authKey)
+    {
+        return $this->getAuthKey() === $authKey;
+    }
+
+    public function getIsAccount(): bool
+    {
+        return $this->role == 0;
+    }
+
+    public function getIsAdmin(): bool
+    {
+        return $this->role == 1;
+    }
+
+    public static function findBylogin($login): User | null
+    {
+        return static::findOne(['login' => $login]);
+    }
+
+    public function validatePassword($password): bool
+    {
+        return Yii::$app->security->validatePassword($password, $this->password);
+    }
 }

@@ -41,11 +41,14 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
         echo Nav::widget([
             'options' => ['class' => 'navbar-nav'],
             'items' => [
-                ['label' => 'Home', 'url' => ['/site/index']],
-                ['label' => 'About', 'url' => ['/site/about']],
+                ['label' => 'Главная', 'url' => ['/site/index']],
 
-                Yii::$app->user->isGuest
-                    ? ['label' => 'Регистрация', 'url' => ['/site/register']]
+                Yii::$app->user->identity?->isAccount
+                    ? ['label' => 'Личный кабинет', 'url' => ['/account']]
+                    : '',
+
+                Yii::$app->user->identity?->isAdmin
+                    ? ['label' => 'Панель администратора', 'url' => ['/admin']]
                     : '',
 
                 Yii::$app->user->isGuest
@@ -53,7 +56,7 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
                     : '<li class="nav-item">'
                     . Html::beginForm(['/site/logout'])
                     . Html::submitButton(
-                        'Logout (' . Yii::$app->user->identity->username . ')',
+                        'Выйти (' . Yii::$app->user->identity->login . ')',
                         ['class' => 'nav-link btn btn-link logout']
                     )
                     . Html::endForm()

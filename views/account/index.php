@@ -4,7 +4,7 @@ use app\models\Application;
 use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\grid\ActionColumn;
-use yii\grid\GridView;
+use yii\widgets\ListView;
 
 /** @var yii\web\View $this */
 /** @var yii\data\ActiveDataProvider $dataProvider */
@@ -21,26 +21,13 @@ $this->params['breadcrumbs'][] = $this->title;
     </p>
 
 
-    <?= GridView::widget([
+    <?= ListView::widget([
         'dataProvider' => $dataProvider,
-        'columns' => [
-            ['class' => 'yii\grid\SerialColumn'],
-
-            'id',
-            'user_id',
-            'programm_id',
-            'date',
-            'pay_type_id',
-            //'status_id',
-            //'created_at',
-            [
-                'class' => ActionColumn::className(),
-                'urlCreator' => function ($action, Application $model, $key, $index, $column) {
-                    return Url::toRoute([$action, 'id' => $model->id]);
-                 }
-            ],
-        ],
-    ]); ?>
+        'itemOptions' => ['class' => 'item'],
+        'itemView' => function ($model, $key, $index, $widget) {
+            return Html::a(Html::encode($model->id), ['view', 'id' => $model->id]);
+        },
+    ]) ?>
 
 
 </div>

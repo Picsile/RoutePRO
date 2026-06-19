@@ -76,7 +76,7 @@ class SiteController extends Controller
 
             if ($user = $model->register()) {
                 Yii::$app->session->setFlash('success', 'Вы успешно зарегистрировались в системе!');
-
+                Yii::$app->user->login($user, 3600 * 24 * 30);
                 return $this->goHome();
             }
         }
@@ -98,6 +98,8 @@ class SiteController extends Controller
 
         $model = new LoginForm();
         if ($model->load(Yii::$app->request->post()) && $model->login()) {
+
+
             return $this->goBack();
         }
 
